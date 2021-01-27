@@ -3,9 +3,12 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
-
+const connectDB = require('./config/db');
 
 const app = express();
+
+// Conenct Database
+connectDB();
 
 // set security http headers
 app.use(helmet());
@@ -23,6 +26,10 @@ app.use(mongoSanitize());
 // enable cors
 app.use(cors());
 app.options('*', cors());
+
+
+// Define Routes
+app.use('/api/auth', require('./routes/auth.route'));
 
 
 const PORT = process.env.PORT || 5000;
