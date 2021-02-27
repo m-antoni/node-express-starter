@@ -1,6 +1,25 @@
 const User = require('../models/User');
 const { userSchema, authSchema } = require('../helpers/validation.helper');
 
+
+/* 
+    @route   GET api/auth/verify
+    @desc    Verify A User's Token if valid or expired
+    @access  public 
+*/
+const authVerify = async (req, res) => {
+    
+    // This means token is verified
+    const data = {
+        user: req.user,
+        id: req.authID,
+        token: req.token
+    }
+    
+    res.json(data);
+}
+
+
 /* 
     @route   POST api/auth/register
     @desc    Register User
@@ -28,13 +47,14 @@ const register = async (req, res) => {
 
         const user = new User(params);
         await user.save();
-        const token = await user.generateAuthToken();
 
-        res.json({ token });
+        const data = await user.generateAuthToken();
+
+        res.json({  user: data.user, id: data.id, token: data.token, redirect: '/home'});
 
     } catch (err) {
         console.log(err)
-        res.status(500).send('Server Error');
+        res.status(500).json({ errors: 'Server Error'});
     }
 }
 
@@ -66,15 +86,15 @@ const login = async (req, res) => {
             return res.status(400).json({ errors: error_msg });
         }
 
-        const token = await user.generateAuthToken();
+        const data = await user.generateAuthToken();
 
-        res.json({ token });
+        res.json({  user: data.user, id: data.id, token: data.token, redirect: '/home'});
 
     } catch (err) {
         console.log(err)
-        res.status(500).send('Server Error');
+        res.status(500).json({ errors: 'Server Error'});
     }  
 }
 
 
-module.exports =  { register, login };
+module.exports =  { register, login, authVerify };

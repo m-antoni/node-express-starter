@@ -14,10 +14,13 @@ const auth = (req, res, next) => {
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.authID = decoded.id;
+        req.authID = decoded._id;
+        req.user = decoded.user;
+        req.token = token;
         next();
         
     } catch (err) {
+        console.log(err)
         return res.status(401).json({ message: 'Token is Invalid.' });
     }
 }
